@@ -9,7 +9,12 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from .config import get_settings
-from .exceptions import AppError, LlmClientNotInitialisedError
+from .exceptions import (
+    AppError,
+    ErrorDetail,
+    ErrorResponse,
+    LLMError,
+)
 from .health.router import health_router
 
 logger = structlog.get_logger(__name__)
@@ -21,19 +26,27 @@ def register_exception_handlers(app: FastAPI) -> None:
         request: Request,
         exc: AppError,
     ) -> JSONResponse:
+        error_response = ErrorResponse(
+            error=ErrorDetail.from_app_error(exc)
+        ).model_dump()
+
         return JSONResponse(
-            status_code=500,
-            content={"error": exc.code, "message": exc.message},
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=error_response,
         )
 
-    @app.exception_handler(LlmClientNotInitialisedError)
+    @app.exception_handler(LLMError)
     async def llm_client_not_initialised_handler(
         request: Request,
-        exc: LlmClientNotInitialisedError,
+        exc: LLMError,
     ) -> JSONResponse:
+        error_response = ErrorResponse(
+            error=ErrorDetail.from_app_error(exc)
+        ).model_dump()
+
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"error": exc.code, "message": exc.message},
+            content=error_response,
         )
 
 
