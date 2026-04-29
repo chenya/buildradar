@@ -71,3 +71,7 @@ docs/_build/
 
 # Pyenv
 .python-version
+
+
+# local files that should not check in git repo
+.local_files/
