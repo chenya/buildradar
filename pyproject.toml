@@ -1,0 +1,66 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "buildradar"
+version = "0.1.0"
+description = "CI/CD build log analyzer with a Rust core and FastAPI interface"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]==0.136.1",
+    "pydantic==2.13.3",
+    "pydantic-settings==2.14.0",
+    "structlog==25.5.0",
+    "anthropic==0.97.0",
+    "python-multipart==0.0.27",
+
+]
+
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-asyncio==1.3.0",
+    "httpx==0.28.1",
+    "ruff>=0.15.12",
+    "mypy>=1.20.2",
+    "jupyter>=1.1.1",
+    "maturin>=1.13.1",
+]
+
+# ─── maturin — Rust extension build config ────────────────────────────────────
+[tool.maturin]
+manifest-path = "logmill/Cargo.toml" # path to the Rust crate
+module-name = "logmill"              # Python import name: import logmill
+python-source = ""                   # root of the Python package tree
+features = ["pyo3/extension-module"]
+
+# ─── pytest ───────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+asyncio_mode = "auto" # pytest-asyncio 1.x requires explicit mode
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+# ─── ruff (linter + formatter) ────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py312"
+line-length = 80
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+]
+
+# ─── mypy ─────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true # logmill is a compiled extension — no stubs

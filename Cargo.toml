@@ -1,0 +1,10 @@
+[workspace]
+members = ["logmill"]
+resolver = "2"
+
+[profile.release]
+# Strip debug symbols for smaller distribution size
+strip = true
+# Link-time optimization for better performance
+lto = true
+codegen-units = 1
