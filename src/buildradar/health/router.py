@@ -18,7 +18,6 @@ async def liveness() -> HealthStatus:
     "/ready", status_code=status.HTTP_200_OK, include_in_schema=False
 )
 async def readiness(llm_client: LLMClient) -> ReadyStatus:
-    # llm_client = None
     if llm_client is None:
         raise LLMError(message="LLM client is unavailable")
 
