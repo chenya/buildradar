@@ -1,7 +1,7 @@
 # src/buildradar/config.py
 
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, Self
 
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -91,7 +91,7 @@ class Settings(BaseSettings):
         return v
 
     @model_validator(mode="after")
-    def disable_docs_in_production(self) -> "Settings":
+    def disable_docs_in_production(self) -> Self:
         """Force docs_enabled = False when env = production."""
         if self.env == "production":
             self.docs_enabled = False

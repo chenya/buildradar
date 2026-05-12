@@ -3,7 +3,10 @@ from collections.abc import AsyncIterator
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from buildradar.main import create_app
+from buildradar.config import Settings, get_settings
+from buildradar.main import app
+
+app.dependency_overrides[get_settings] = lambda: Settings(env="development")
 
 
 class FakeAsyncAnthropic:
@@ -30,12 +33,18 @@ def fake_llm() -> FakeAsyncAnthropic:
 @pytest.fixture
 async def client() -> AsyncIterator[AsyncClient]:
     """
-    Provide an async HTTP client pointed at a fresh application instance.
+    Bypass the lifespan entirely by setting app.state directly.
 
-    A new app is created per test to guarantee complete state isolation.
-    Each test sees a clean slate with no shared mutable state.
+    The lifespan is responsible for two things: creating the client
+    and closing it. We take over both responsibilities here:
+    - Creation: app.state.llm_client = fake_llm
+    - Teardown: del app.state.llm_client (prevents state bleed)
+
+    AsyncClient with ASGITransport does NOT trigger the lifespan
+    unless you pass lifespan="on" explicitly — the default is "off",
+    so this is safe.
     """
-    app = create_app()
+
     app.state.llm_client = fake_llm
     async with AsyncClient(
         transport=ASGITransport(app=app),
@@ -49,12 +58,10 @@ async def client() -> AsyncIterator[AsyncClient]:
 @pytest.fixture
 async def client_without_llm() -> AsyncIterator[AsyncClient]:
     """
-    Provide an async HTTP client pointed at a fresh application instance.
-
-    A new app is created per test to guarantee complete state isolation.
-    Each test sees a clean slate with no shared mutable state.
+    Simulate the branch where anthropic_api_key is absent at startup,
+    which sets llm_client = None and causes /ready to return 503.
     """
-    app = create_app()
+
     app.state.llm_client = None
     async with AsyncClient(
         transport=ASGITransport(app=app),
