@@ -81,8 +81,8 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Buildradar",
         version="1.0.0",
-        docs_url="/docs" if settings.env != "production" else None,
-        redoc_url="/redoc" if settings.env != "production" else None,
+        docs_url=settings.docs_url,
+        redoc_url=settings.redoc_url,
         lifespan=lifespan,
     )
 

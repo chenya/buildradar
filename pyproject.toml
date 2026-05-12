@@ -42,7 +42,10 @@ features = ["pyo3/extension-module"]
 asyncio_mode = "auto" # pytest-asyncio 1.x requires explicit mode
 testpaths = ["tests"]
 pythonpath = ["src"]
-
+markers = [
+    "integration: tests that touch real infrastructure",
+    "api: tests that exercise HTTP endpoints",
+]
 # ─── ruff (linter + formatter) ────────────────────────────────────────────────
 [tool.ruff]
 target-version = "py312"
