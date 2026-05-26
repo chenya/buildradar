@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 
 import structlog
@@ -23,6 +24,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         AsyncAnthropic(api_key=settings.anthropic_api_key.get_secret_value())
         if settings.anthropic_api_key
         else None
+    )
+
+    app.state.thread_pool = ThreadPoolExecutor(
+        max_workers=settings.thread_pool_workers
     )
     log.info("startup.complete")
 
