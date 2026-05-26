@@ -44,6 +44,8 @@ class LogAnalysisRequest(BaseModel):
 
 
 class LogAnalysisResponse(BaseModel):
+    analysis_id: str
+    analyzed_at: str
     format: str
     errors: list[str]
     warnings: list[str]

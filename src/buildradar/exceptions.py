@@ -16,6 +16,16 @@ class LLMError(AppError):
     code: str = "llm_unavailable"
 
 
+@dataclass
+class UploadFileEmptyError(AppError):
+    code: str = "upload_file_empty"
+
+
+@dataclass
+class UploadFileTooLargeError(AppError):
+    code: str = "upload_file_too_large"
+
+
 # Serialization schema — separate Pydantic model
 class ErrorDetail(BaseModel):
     message: str
