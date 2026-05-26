@@ -3,6 +3,7 @@
 import structlog
 from fastapi import FastAPI
 
+from .analyze.router import analyze_router
 from .config import get_settings
 from .exception_handlers import register_exception_handlers
 from .health.router import health_router
@@ -24,6 +25,9 @@ def create_app() -> FastAPI:
 
     register_exception_handlers(app)
     app.include_router(health_router, prefix="", tags=["health"])
+    app.include_router(
+        analyze_router, prefix=settings.api_v1_prefix, tags=["analyze"]
+    )
     return app
 
 
