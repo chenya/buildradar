@@ -9,6 +9,7 @@ from .exceptions import (
     ErrorDetail,
     ErrorResponse,
     LLMError,
+    UnsupportedMediaTypeError,
     UploadFileEmptyError,
     UploadFileTooLargeError,
 )
@@ -16,8 +17,9 @@ from .exceptions import (
 _EXCEPTION_TO_STATUS_MAP: dict[type[AppError], int] = {
     AppError: status.HTTP_500_INTERNAL_SERVER_ERROR,
     LLMError: status.HTTP_503_SERVICE_UNAVAILABLE,
-    UploadFileEmptyError: status.HTTP_400_BAD_REQUEST,
+    UploadFileEmptyError: status.HTTP_422_UNPROCESSABLE_CONTENT,
     UploadFileTooLargeError: status.HTTP_413_CONTENT_TOO_LARGE,
+    UnsupportedMediaTypeError: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
 }
 
 
@@ -33,6 +35,15 @@ def _build_error_response(exc: AppError, status_code: int) -> JSONResponse:
 
 def register_exception_handlers(app: FastAPI) -> None:
     """Register all application exception handlers."""
+
+    @app.exception_handler(UnsupportedMediaTypeError)
+    async def unsupported_media_type_error_handler(
+        request: Request,
+        exc: UnsupportedMediaTypeError,
+    ) -> JSONResponse:
+        return _build_error_response(
+            exc, _EXCEPTION_TO_STATUS_MAP[UnsupportedMediaTypeError]
+        )
 
     @app.exception_handler(UploadFileEmptyError)
     async def upload_file_empty_error_handler(

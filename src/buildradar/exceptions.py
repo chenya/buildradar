@@ -18,12 +18,17 @@ class LLMError(AppError):
 
 @dataclass
 class UploadFileEmptyError(AppError):
-    code: str = "upload_file_empty"
+    code: str = "empty_file"
 
 
 @dataclass
 class UploadFileTooLargeError(AppError):
-    code: str = "upload_file_too_large"
+    code: str = "file_too_large"
+
+
+@dataclass
+class UnsupportedMediaTypeError(AppError):
+    code: str = "media_type_not_supported"
 
 
 # Serialization schema — separate Pydantic model
