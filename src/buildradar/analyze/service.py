@@ -3,10 +3,10 @@ import random
 import uuid
 from datetime import UTC, datetime
 
-from .schemas import LogAnalysisResponse
+from .schemas import AnalyzeResponse
 
 
-def parse_log(raw: str) -> LogAnalysisResponse:
+def parse_log(raw: str) -> AnalyzeResponse:
     analyze_log_1 = {
         "format": "jenkins",
         "errors": [
@@ -158,11 +158,11 @@ def parse_log(raw: str) -> LogAnalysisResponse:
     random_log = random.choice(analyze_logs)
     random_log["analysis_id"] = ""
     random_log["analyzed_at"] = ""
-    return LogAnalysisResponse(**random_log)
+    return AnalyzeResponse(**random_log)
 
 
 class AnalyzeService:
-    async def analyze(self, raw: str) -> LogAnalysisResponse:
+    async def analyze(self, raw: str) -> AnalyzeResponse:
         # fmt = detect_format(raw)
         fmt = "jenkins"
         # parsed = await asyncio.to_thread(
@@ -172,7 +172,7 @@ class AnalyzeService:
         # )
         parsed = await asyncio.to_thread(parse_log, raw)
 
-        return LogAnalysisResponse(
+        return AnalyzeResponse(
             analysis_id=str(uuid.uuid4()),
             analyzed_at=datetime.now(UTC).isoformat(),
             format=fmt,

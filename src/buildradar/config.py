@@ -56,6 +56,10 @@ class Settings(BaseSettings):
     #           /diagnose returns 503 and /ready returns unavailable.
     # /analyze is fully independent and unaffected.
     anthropic_api_key: SecretStr | None = None
+    anthropic_model: Literal[
+        "claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8"
+    ] = "claude-haiku-4-5"
+    anthropic_max_tokens: int = 4096
 
     # ── Computed properties ──────────────────────────────────────────────────
     @property

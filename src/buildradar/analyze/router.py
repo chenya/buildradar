@@ -2,11 +2,11 @@ from fastapi import APIRouter, UploadFile, status
 
 from ..dependencies import AppSettings
 from ..exceptions import (
-    UnsupportedMediaTypeError,
+    UnsupportedFormatError,
     UploadFileEmptyError,
     UploadFileTooLargeError,
 )
-from .schemas import LogAnalysisResponse
+from .schemas import AnalyzeResponse
 from .service import AnalyzeService
 
 analyze_router = APIRouter(prefix="/analyze", tags=["analyze"])
@@ -14,7 +14,7 @@ analyze_router = APIRouter(prefix="/analyze", tags=["analyze"])
 
 @analyze_router.post(
     "/",
-    response_model=LogAnalysisResponse,
+    response_model=AnalyzeResponse,
     status_code=status.HTTP_200_OK,
     responses={
         415: {
@@ -26,7 +26,7 @@ analyze_router = APIRouter(prefix="/analyze", tags=["analyze"])
 )
 async def analyze_log(
     upload_file: UploadFile, app_settings: AppSettings
-) -> LogAnalysisResponse:
+) -> AnalyzeResponse:
 
     def _check_file_size(num_bytes: int) -> None:
         if num_bytes > app_settings.max_file_size_bytes:
@@ -55,7 +55,7 @@ async def analyze_log(
         }
 
         if content_type not in allowed_content_types:
-            raise UnsupportedMediaTypeError(
+            raise UnsupportedFormatError(
                 message=f"{content_type} is not supported",
                 details={"supported_types": list(allowed_content_types)},
             )

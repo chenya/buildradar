@@ -27,8 +27,8 @@ class UploadFileTooLargeError(AppError):
 
 
 @dataclass
-class UnsupportedMediaTypeError(AppError):
-    code: str = "media_type_not_supported"
+class UnsupportedFormatError(AppError):
+    code: str = "unsupported_format"
 
 
 # Serialization schema — separate Pydantic model
